@@ -36,3 +36,4 @@ node_modules/
 android/health-collector/.gradle/
 android/health-collector/build/
 android/health-collector/app/build/
+*.aar

@@ -8,6 +8,13 @@ android {
     namespace = "com.aicare.collector"
     compileSdk = 35
 
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.14"
+    }
+
     defaultConfig {
         // ---------------------------------------------------------------
         // THE package name. Single source of truth.
@@ -43,6 +50,15 @@ android {
 }
 
 dependencies {
+    val composeBom = platform("androidx.compose:compose-bom:2024.09.00")
+    implementation(composeBom)
+    implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui")
+    implementation("androidx.compose.ui:ui-tooling-preview")
+    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.core:core-ktx:1.13.1")
@@ -52,7 +68,9 @@ dependencies {
     implementation("androidx.health.connect:connect-client:1.1.0-alpha10")
 
     // --- Route B: Samsung Health Data SDK --------------------------------
-    // Not a Maven artifact — the SDK ships as an .aar you download from
-    // developer.samsung.com and drop into app/libs/. Uncomment when used:
-    // implementation(files("libs/samsung-health-data-api-1.0.0.aar"))
+    // Not a Maven artifact — download the .aar from developer.samsung.com and
+    // drop it into app/libs/ (see app/libs/README.md). Picked up automatically:
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.aar"))))
+    // The SDK's own samples list gson as a runtime dependency:
+    implementation("com.google.code.gson:gson:2.10.1")
 }

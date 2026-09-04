@@ -71,12 +71,45 @@ downstream.
 5. Re-sending an overlapping window is the expected pattern, not a problem.
 6. `hrvRmssdMs` is RMSSD in milliseconds, or it does not go in that field.
 
-## Suggested build order
+## Current state (Route B, Samsung Health Data SDK)
 
-1. Permissions + read one sleep session. Log it. Nothing else.
-2. Map it to `SleepSessionDto`, serialize, print the JSON.
-3. POST to `/api/v1/ingest` with the bearer token. Confirm `accepted: true`.
-4. Add the remaining types one at a time, re-POSTing after each.
-5. Only then add a background sync worker.
+Developer mode "Data read" is enabled — no access code needed for this route.
 
-Do not build the UI first.
+Written and structurally complete, **not yet compiled or run on a device**
+(no Android SDK / AAR available in the environment that wrote this):
+
+- `Contract.kt` — full wire format, mirrors `backend/app/schemas.py` exactly.
+- `Uploader.kt` — POST to `/api/v1/ingest`, handles 200/422/network failure.
+- `SamsungHealthReader.kt` — store creation, permission request, and the
+  `readData()` call shape, built from Samsung's own guide and API-reference
+  pages (confirmed: `HealthDataService.getStore`, `Permission.of(DataType,
+  AccessType.READ)`, `DataTypes.X.readDataRequestBuilder`,
+  `LocalTimeFilter.of(start, end)`, `store.readData(request)`).
+- `MainActivity.kt` — Compose UI: grant permissions, sync last 7 days, show
+  the JSON on screen, upload it.
+
+**What is explicitly a TODO in `SamsungHealthReader.kt`, and why:** the exact
+field layout of a returned `HealthDataPoint` (how to read a sleep stage
+duration, how to get a stable per-record UID for `sourceUid`) could not be
+verified — developer.samsung.com is unreachable from the environment that
+wrote this code. Three methods throw `NotImplementedError` with a comment
+pointing at exactly what to check once the AAR is added and Android Studio's
+autocomplete can show the real API: `readAll()`, `toSleepDto()`,
+`toWorkoutDto()`. `DataTypes.BODY_COMPOSITION` / `ACTIVE_CALORIES_BURNED` /
+`HEART_RATE_VARIABILITY_RMSSD` constant names are also unverified — confirmed
+constants are `SLEEP`, `HEART_RATE`, `STEPS`, `EXERCISE`.
+
+## Build order from here
+
+1. Get the project to open in Android Studio and sync Gradle (needs the AAR
+   in `app/libs/` — see `app/libs/README.md`).
+2. Fix the three `NotImplementedError` spots using autocomplete on the real
+   SDK types. This is a compile-and-fix loop, not a research project — the
+   plumbing around them is already right.
+3. Run on a device with developer mode read enabled. Tap "Grant permissions",
+   then "Sync last 7 days". Read the JSON on screen before trusting it.
+4. POST to `/api/v1/ingest`, confirm `accepted: true` and `features_recomputed
+   > 0`, then check `/api/v1/report` for a real (non-synthetic) score.
+5. Only then add a background sync worker (WorkManager, daily).
+
+Do not build more UI. The screen above is deliberately the whole app.
