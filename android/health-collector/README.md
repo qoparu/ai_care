@@ -34,12 +34,29 @@ Android 14+. You request runtime permissions and read.
 
 ### B. Samsung Health Data SDK + developer mode
 
-Full surface. Developer mode exists precisely so an unpublished, personally
-signed app can read your own data on your own device; partner approval is a
-Play Store distribution concern, not a personal-use one.
+Full surface, but read the access-code caveat before committing to it.
 
-- Verify current requirements: <https://developer.samsung.com/health/data/guide/developer-mode.html>
-- Developer mode is device-local and can need re-enabling after updates.
+Enable developer mode: Samsung Health -> ⋮ -> Settings -> About Samsung Health
+-> tap the version line 10+ times. A "Developer mode (Samsung Health Data SDK)"
+entry appears.
+
+Inside it there are two different things, and they are easy to confuse:
+
+- **A read toggle** ("Developer mode for Data read"). This is the one this
+  project needs. Reading your own data does **not** require an access code.
+- **An "app package name + access code" form.** This is for *writing* data.
+  The access code is **issued by Samsung** after a partnership request — it is
+  not self-generated, and it is case-sensitive. Do not try to invent one.
+
+If the package-name form is filled in, the package name must be exactly the
+`applicationId` from `app/build.gradle.kts`: **`com.aicare.collector`**.
+
+Reports on the Samsung developer forum indicate the partner application process
+has been suspended at times. If reading turns out to require an access code on
+your build, this route is closed and Route A is the answer — it depends on no
+approval from anyone.
+
+Verify against the current docs: <https://developer.samsung.com/health/data/guide/developer-mode.html>
 
 The backend does not care which route you take. Switching later costs nothing
 downstream.
