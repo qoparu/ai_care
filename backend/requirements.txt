@@ -1,0 +1,16 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+sqlalchemy>=2.0
+alembic>=1.13
+pydantic>=2.7
+pydantic-settings>=2.3
+psycopg2-binary>=2.9
+httpx>=0.27
+python-dotenv>=1.0
+
+# Optional: only needed when LLM_PROVIDER=anthropic.
+# OpenAI / Google / Ollama go over plain HTTP and need nothing extra.
+anthropic>=0.40
+
+# dev
+pytest>=8.0

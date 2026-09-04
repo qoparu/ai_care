@@ -1,0 +1,38 @@
+# secrets — NEVER commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets/
+android/health-collector/local.properties
+android/health-collector/keystore*
+
+# python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# local data — real health data must never reach git
+data/
+*.db
+*.sqlite3
+exports/
+dumps/
+*.dump
+
+# tooling
+.idea/
+.vscode/
+.DS_Store
+node_modules/
+
+# android
+android/health-collector/.gradle/
+android/health-collector/build/
+android/health-collector/app/build/
